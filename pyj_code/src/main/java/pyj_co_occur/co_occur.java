@@ -1,4 +1,4 @@
-package pyj_hadoop;
+package pyj_co_occur;
 
 import java.io.IOException;
 import java.io.StringReader;
