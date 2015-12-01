@@ -69,8 +69,8 @@ public class co_occur {
 						ptvword.contains(match)==false) //년도와 논문번호 여부 체커 & 명사여부 체크  (year:2011 나 with같은 명사가아닌것들을 제거.)
 				{
 					words.add(ptvword); // 골라낸 명사를 워드리스트에 단어별로 싹다넣는다.
-					word.set("*\t" + ptvword);
-					context.write(word, one);
+					word.set("*\t" + ptvword); // 하나의 워드에 대한 빈도수 보낸다. 
+					context.write(word, one);//(*	apple	1)
 				}
 			}
 			

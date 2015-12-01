@@ -1,6 +1,7 @@
 package pyj_hadoop;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -12,6 +13,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
+
+import edu.stanford.nlp.ling.Word;
 
 public class ngram {
 //■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ MAPPER ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -33,55 +36,36 @@ public class ngram {
 		String before[] = {"", "", ""};// 이전에 처리중인 단어들을 담아둔다. n그램 함수 사용시필요.
 		
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-			StringTokenizer itr = new StringTokenizer(value.toString().toLowerCase(), "\n\t "); //탭,엔터,공백으로 나눔
+			//StringTokenizer itr = new StringTokenizer(value.toString().toLowerCase(), "\n\t "); //탭,엔터,공백으로 나눔
+		
+			String[] tokens = value.toString().toLowerCase().split(" ");
 			//itr 에 mapper 인풋인 year:2003, journal_no:1 ,  The, DNA, microarray..... 들이 들어감 
 			
-			
-			while (itr.hasMoreTokens()) //itr을 끝까지 순회한다.
+			//List ptbwords =new StringTokenizer(value.toString().toLowerCase(), "\n\t ");;
+			for (int i = 0 ; i < tokens.length ; i ++) //itr을 끝까지 순회한다.
 			{
-				String a = itr.nextToken(); //ex)a에 하나의 단어가 들어감
+				String token = tokens[i]; //ex)a에 하나의 단어가 들어감
 
 				//■■■■■■■■■■■■■■■■■■■■■■■■■현재 변수a에 들어있는 단어(토큰)가 몇년도 몇번째논문에 나온것인지 체크 ■■■■■■■■■■■■■■■■■■
 				
-				if (a.contains("year:")) // year:2003를 만나면 현재 처리중인 논문이 2003년도 논문. 
+				if (token.contains("year:")) // year:2003를 만나면 현재 처리중인 논문이 2003년도 논문. 
 				{
-					year_temp = a.substring(5); //year_temp에 2003을 넣는다.
-				} else if (a.contains("journal_no:")) //"journal_no:201"을만나면 현재 논문이 201번째 논문이라는 뜻.
+					year_temp = token.substring(5); //year_temp에 2003을 넣는다.
+				} else if (token.contains("journal_no:")) //"journal_no:201"을만나면 현재 논문이 201번째 논문이라는 뜻.
 		
 				{
-					journal_no_temp = a.substring(11);
+					journal_no_temp = token.substring(11);
 				}
 				
-				//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+				//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 				
-				
-				
-				
-				//■■■■■■■■■■■■■■■■■■■■■■■■■n그램 계산부분 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-				int ngram = 1; // N그램 선택 1: 1gram 2: 2gram
 				String ngram_set = "";
-				if (ngram == 1) {
-					ngram_set = a;
-				} else if (ngram == 2) {
-					ngram_set = before[0] + " " + a;
-					before[0] = a;
-				} else if (ngram == 3) {
-					ngram_set = before[0] + " " + before[1] + " " + a;
-					before[0] = before[1];
-					before[1] = a;
-
-				} else if (ngram == 4) {
-					ngram_set = before[0] + " " + before[1] + " " + before[2] + " " + a;
-					before[0] = before[1];
-					before[1] = before[2];
-					before[2] = a;
-
-				}
-				for(int i = 0 ; i < ngram ; i ++)
+				int ngram = 0;
+				for(int j = i - ngram ; j < i ; j ++)
 				{
-					
-				}
+					ngram_set += tokens[j] + " ";
+				} // n그램 계산 부분.
 				//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 				//2그램이면 ngram_set = apple dog
 				//3그램이면 ngram_set = apple dog pizza가 들어갈 것이다.
@@ -106,12 +90,6 @@ public class ngram {
 	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 	
-	
-	
-	
-	
-	
-	
 	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■COMBINER ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	public static class IntSumcom extends Reducer<Text, IntWritable, Text, IntWritable> {
 		private IntWritable result = new IntWritable();
@@ -126,12 +104,9 @@ public class ngram {
 			context.write(key, result);
 		}
 	}
+
 	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
-	
-	
-	
-	
 	
 	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■REDUCER■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 	public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
