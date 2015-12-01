@@ -1,4 +1,4 @@
-package pyj_co_occur;
+package pyj_hadoop;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -50,20 +50,26 @@ public class co_occur {
 
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 			int W_S = 10; // 윈도우 사이즈
-			List<Object> words = new ArrayList<Object>();//co occur 알고리즘사용에 위하나 리스트
-			String match = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]"; // 유효성검사          
+			
+			List<Object> words = new ArrayList<Object>();//co_occur 알고리즘사용에 위한 리스트
+			
+			String match = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]"; // 유효성검사를 위한          
+			
 			PTBTokenizer<Word> ptb = PTBTokenizer.newPTBTokenizer(new StringReader((value.toString().toLowerCase())));
-			List<Word> ptbword = ptb.tokenize(); // 스탠포드 토크나이제이션 사용.
-			for(int i  = 0 ; i < ptbword.size() ; i++){
-				String a  = ptbword.get(i).toString();
-				String tagged = tagger.tagString(a);// 스탠포드 포스 태그를붙힌다
-				if ((a.length() > 1 && a.length() < 20) &&
-						((tagged.contains("yearck") || tagged.contains("artnck")) == false) && 
+			
+			List<Word> ptbwords = ptb.tokenize(); // 스탠포드 토크나이제이션 사용.
+			
+			for(int i  = 0 ; i < ptbwords.size() ; i++){
+				
+				String ptvword  = ptbwords.get(i).toString();
+				String tagged = tagger.tagString(ptvword);// 스탠포드 포스 태그를붙힌다
+				if ((ptvword.length() > 1 && ptvword.length() < 20) &&
+						((tagged.contains("year:") || tagged.contains("journal_no:")) == false) && 
 						(tagged.contains("_NNS") || tagged.contains("NN")) &&
-						a.contains(match)==false) //년도와 논문번호 체커 & 명사여부 체크  (yearck2011 나 with같은 명사가아닌것들을 제거.)
+						ptvword.contains(match)==false) //년도와 논문번호 여부 체커 & 명사여부 체크  (year:2011 나 with같은 명사가아닌것들을 제거.)
 				{
-					words.add(a); // 골라낸 명사를 워드리스트에 단어별로 싹다넣는다.
-					word.set("*\t" + a);
+					words.add(ptvword); // 골라낸 명사를 워드리스트에 단어별로 싹다넣는다.
+					word.set("*\t" + ptvword);
 					context.write(word, one);
 				}
 			}
@@ -151,8 +157,6 @@ public class co_occur {
 				String word1 = temp[0]; //apple
 				String word2 = temp[1]; //dog
 				int value = sum; //4 이런식으로 넣는다 나눠서.
-
-
 
 				if (word1.equals("*")) // 각토큰의 빈도수를 wordsum에 저장 wordval에 빈도수저장.
 				{
