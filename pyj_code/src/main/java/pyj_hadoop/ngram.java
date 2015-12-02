@@ -30,8 +30,8 @@ public class ngram {
 	///맵퍼///
 	public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
 
-		String journal_no_temp = ""; // 처리중인 단어 논문번호
-		String year_temp = ""; // 파싱중인 단어 년도
+		String journal_no = ""; // 처리중인 단어 논문번호
+		String year = ""; // 파싱중인 단어 년도
 
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
@@ -43,11 +43,11 @@ public class ngram {
 				
 				if (token.contains("year:"))
 				{
-					year_temp = token.substring(5); // 년도 추출
+					year = token.substring(5); // 년도 추출
 				} 
 				else if (token.contains("journal_no:"))
 				{
-					journal_no_temp = token.substring(11); // 논문번호 추출
+					journal_no = token.substring(11); // 논문번호 추출
 				}
 
 				String ngram_set = "";
@@ -69,7 +69,7 @@ public class ngram {
 							
 							Text word = new Text();
 							int what_gram = ngram_set.split(" ").length;
-							word.set(what_gram + ") "+year_temp + "\t" + ngram_set + "\t" + journal_no_temp);
+							word.set(what_gram + ") "+year + "\t" + ngram_set + "\t" + journal_no);
 							IntWritable one = new IntWritable(1);
 							context.write(word, one); // 컴바이너에게 보냄.  output : (2015   apple   4    1)
 					}
@@ -95,9 +95,6 @@ public class ngram {
 			context.write(key, result);
 		}
 	}
-
-
-	
 	
 	
 	
