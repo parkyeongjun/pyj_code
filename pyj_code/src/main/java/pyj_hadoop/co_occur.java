@@ -49,13 +49,8 @@ public class co_occur {
 
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 			int W_S = 10; // 윈도우 사이즈
-			
 			List<Object> words = new ArrayList<Object>();//co_occur 알고리즘사용에 위한 리스트
-			
-			       
-			
 			PTBTokenizer<Word> ptb = PTBTokenizer.newPTBTokenizer(new StringReader((value.toString().toLowerCase())));
-			
 			List<Word> ptbwords = ptb.tokenize(); // 스탠포드 토크나이제이션 사용.
 			
 			for(int i  = 0 ; i < ptbwords.size() ; i++)
@@ -84,7 +79,6 @@ public class co_occur {
 			
 			//co_occur algorithm 
 			// 인터넷 알고리즘 참고 //
-			
 			for (int i = 0; i < words.size(); i++) {
 				int sum = 0;
 				for (int j = 0; j < W_S; j++) {
@@ -110,16 +104,11 @@ public class co_occur {
 		}
 	}
 	//
-	
-	
-	
-	
-	
-	
-	
 
-
-
+	
+	
+	
+	
 	
 	//COMBINER 
 	public static class IntSumcom extends Reducer<Text, IntWritable, Text, IntWritable> {
@@ -139,12 +128,25 @@ public class co_occur {
 	
 	
 	
+/*	
+  	*	a	12
+	*	b	14
+	*	c	15
+	*	d	72
+		.
+		.
+		.
+	*	z	45         //단어하나의 빈도수 다 들어온후.
+	a	b	4
+	b	c	5
+	c	d	3
+		.
+		.
+		.
+	y	z	5
+*///reducer input.
 	
-	
-	
-	
-	
-	
+
 	
 	//REDUCER
 	public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {

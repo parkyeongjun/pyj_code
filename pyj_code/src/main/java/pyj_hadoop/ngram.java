@@ -68,7 +68,8 @@ public class ngram {
 						}
 							
 							Text word = new Text();
-							word.set(year_temp + "\t" + ngram_set + "\t" + journal_no_temp);
+							int what_gram = ngram_set.split(" ").length;
+							word.set(what_gram + ") "+year_temp + "\t" + ngram_set + "\t" + journal_no_temp);
 							IntWritable one = new IntWritable(1);
 							context.write(word, one); // 컴바이너에게 보냄.  output : (2015   apple   4    1)
 					}
