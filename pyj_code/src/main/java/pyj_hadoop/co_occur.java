@@ -32,7 +32,6 @@ public class co_occur {
 		job.setJarByClass(co_occur.class);
 		job.setMapperClass(TokenizerMapper.class);
 		job.setCombinerClass(IntSumcom.class);
-//		job.setReducerClass(IntSumcom.class);
 		job.setReducerClass(IntSumReducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
@@ -40,7 +39,7 @@ public class co_occur {
 		FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 	}
-	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ MAPPER ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	/////// MAPPER ///////
 	public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
 
 		private final static IntWritable one = new IntWritable(1);
@@ -53,29 +52,37 @@ public class co_occur {
 			
 			List<Object> words = new ArrayList<Object>();//co_occur 알고리즘사용에 위한 리스트
 			
-			String match = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]"; // 유효성검사를 위한          
+			       
 			
 			PTBTokenizer<Word> ptb = PTBTokenizer.newPTBTokenizer(new StringReader((value.toString().toLowerCase())));
 			
 			List<Word> ptbwords = ptb.tokenize(); // 스탠포드 토크나이제이션 사용.
 			
-			for(int i  = 0 ; i < ptbwords.size() ; i++){
+			for(int i  = 0 ; i < ptbwords.size() ; i++)
+			{
 				
-				String ptvword  = ptbwords.get(i).toString();
-				String tagged = tagger.tagString(ptvword);// 스탠포드 포스 태그를붙힌다
-				if ((ptvword.length() > 1 && ptvword.length() < 20) &&
-						((tagged.contains("year:") || tagged.contains("journal_no:")) == false) && 
-						(tagged.contains("_NNS") || tagged.contains("NN")) &&
-						ptvword.contains(match)==false) //년도와 논문번호 여부 체커 & 명사여부 체크  (year:2011 나 with같은 명사가아닌것들을 제거.)
-				{
-					words.add(ptvword); // 골라낸 명사를 워드리스트에 단어별로 싹다넣는다.
-					word.set("*\t" + ptvword); // 하나의 워드에 대한 빈도수 보낸다. 
-					context.write(word, one);//(*	apple	1)
-				}
+				String ptbword  = ptbwords.get(i).toString();
+				String tagged = tagger.tagString(ptbword);// 스탠포드 포스 태그를붙힌다
+				
+
+				if(ptbword.length() > 1 && ptbword.length() < 20)//단어길이여부
+					continue;
+				if(ptbword.contains("year:") || ptbword.contains("journal_no:"))//체커여부
+					continue;
+				if((tagged.contains("_NNS") || tagged.contains("NN"))==false)//명사여부
+					continue;
+				String match = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]"; // 유효성검사를 위한   
+				if(ptbword.contains(match)) // 유효성 여부
+					continue;
+				
+				words.add(ptbword); // 골라낸 명사를 워드리스트에 단어별로 싹다넣는다.
+				word.set("*\t" + ptbword); // 하나의 워드에 대한 빈도수 보낸다. 
+				context.write(word, one);//(*	apple	1)
+				
 			}
 			
 			
-			//■■■■■■■■■■■■■■■■■■■■■■■■■co_occur algorithm ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+			//co_occur algorithm 
 			// 인터넷 알고리즘 참고 //
 			
 			for (int i = 0; i < words.size(); i++) {
@@ -96,13 +103,13 @@ public class co_occur {
 					// context.write(word, one);////////////////////
 				}
 			}
-			//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+			//
 
 								
 			
 		}
 	}
-	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	//
 	
 	
 	
@@ -114,7 +121,7 @@ public class co_occur {
 
 
 	
-	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■COMBINER ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	//COMBINER 
 	public static class IntSumcom extends Reducer<Text, IntWritable, Text, IntWritable> {
 		private IntWritable result = new IntWritable();
 
@@ -128,7 +135,7 @@ public class co_occur {
 			context.write(key, result);
 		}
 	}
-	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	//
 	
 	
 	
@@ -139,7 +146,7 @@ public class co_occur {
 	
 	
 	
-	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■REDUCER■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	//REDUCER
 	public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 		private IntWritable result = new IntWritable();
 		HashMap<String , Integer> map = new HashMap<String , Integer>(); // 해쉬맵사용.
@@ -184,5 +191,5 @@ public class co_occur {
 			}
 		}
 	}
-	//■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+	//
 }

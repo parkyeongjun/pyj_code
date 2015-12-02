@@ -9,6 +9,7 @@ import java.util.zip.ZipInputStream;
 
 public class data_handler {
 	public static void main(String args[]) throws IndexOutOfBoundsException, NullPointerException {
+		
 		xml_parser();
 
 	}
@@ -82,7 +83,7 @@ public class data_handler {
 				is.close();
 			}
 		} catch (IOException e) {
-			System.err.println(e); // ?????? ???? ????? ???
+			System.err.println(e);
 			System.exit(1);
 
 		}
