@@ -1,5 +1,17 @@
 package pyj.hadoop;
 
+
+/////PLoS Biology_20150903.zip,PLoS Computational Biology_20150903.zip등이 들어있는 폴더에서 바디부분을 불러와서
+/////parsed_xml이라는 ㅎ나의 파잉료 바꿔준다
+/////parsed_xml의 형식은 아래와 같다.
+
+/*
+year:2003 journal_no:0             This project is part of an ongoing multicentre collaboration on elephant conservation. All authors on this manuscript contributed substantively to the work described herein. 
+year:2003 journal_no:0           The authors have declared that no conflicts of interest exist. 
+year:2003 journal_no:1          The origin of Borneo's elephants is controversial. Two competing hypotheses argue that they are either indigenous, tracing back to the Pleistocene, or were introduced, descending from elephants imported in the 16thâ18th centuries. Taxonomically, they have either been classified as a unique subspecies or placed under the Indian or Sumatran subspecies. If shown to be a unique indigenous population, this would extend the natural species range of the Asian elephant by 1300 km, and therefore Borneo elephants would have much greater conservation importance than if they were a feral population. We compared DNA of Borneo elephants to that of elephants from across the range of the Asian elephant, using a fragment of mitochondrial DNA, including part of the hypervariable d-loop, and five autosomal microsatellite loci. We find that Borneo's elephants are genetically distinct, with molecular divergence indicative of a Pleistocene colonisation of Borneo and subsequent isolation. We reject the hypothesis that Borneo's elephants were introduced. The genetic divergence of Borneo elephants warrants their recognition as a separate evolutionary significant unit. Thus, interbreeding Borneo elephants with those from other populations would be contraindicated in ex situ conservation, and their genetic distinctiveness makes them one of the highest priority populations for Asian elephant conservation. 
+year:2004 journal_no:2          Comparison between DNA sequences of Borneo elephants with those of other Asian elephants settles a longstanding dispute about the origins of these endangered animals. 
+*///년도와 몇번째 논문인지 정보를 담고있다.
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
